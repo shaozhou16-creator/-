@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="theme-color" content="#3b82f6" />
+    <title>考研刷题助手</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-bar">
+        <div>
+          <p class="brand-subtitle">手机端智能刷题</p>
+          <h1>考研刷题助手</h1>
+        </div>
+        <button id="offlineToggle" class="chip">离线模式：关闭</button>
+      </header>
+
+      <main class="content" id="content">
+        <section class="summary-card">
+          <h2>今日学习面板</h2>
+          <div class="summary-grid">
+            <div><strong>4</strong><span>核心模块</span></div>
+            <div><strong>PDF</strong><span>多文件题库</span></div>
+            <div><strong>AI</strong><span>解析补全</span></div>
+          </div>
+        </section>
+
+        <section class="panel active" data-panel="math">
+          <h2>数学界面</h2>
+          <p class="hint">支持上传多个题目册 PDF + 解析册 PDF（会优先增强数学符号提取）。</p>
+          <div class="upload-grid">
+            <label class="upload-card">
+              <span>上传题目册 PDF（可多选）</span>
+              <input type="file" accept="application/pdf" multiple data-module="math" data-type="question" />
+            </label>
+            <label class="upload-card">
+              <span>上传解析册 PDF（可多选）</span>
+              <input type="file" accept="application/pdf" multiple data-module="math" data-type="analysis" />
+            </label>
+          </div>
+          <div class="mock-question">
+            <h3>刷题预览</h3>
+            <p>示例题目：已知函数 \(f(x)=x^2+2x+1\)，求导并选择正确答案。</p>
+            <button data-reveal="math">提交答案并查看解析</button>
+            <div class="answer hidden" id="mathAnswer">
+              <p><strong>解析册：</strong>\(f'(x)=2x+2\)。</p>
+              <p><strong>AI 解析：</strong>先展开函数结构，再按幂函数求导，线性项导数为常数，常数项导数为 0。</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="english">
+          <h2>英语界面</h2>
+          <p class="hint">上传单词 PDF 制作刷题系统，并支持中英模式切换 + 单词朗读。</p>
+          <div class="upload-grid">
+            <label class="upload-card">
+              <span>上传英语单词 PDF（可多选）</span>
+              <input type="file" accept="application/pdf" multiple data-module="english" data-type="vocabulary" />
+            </label>
+          </div>
+
+          <div class="mode-switch">
+            <span>刷题模式：</span>
+            <button class="chip active" data-mode="cn-to-en">中文选英文（A/B/C/D）</button>
+            <button class="chip" data-mode="en-to-cn">英文选中文（A/B/C/D）</button>
+          </div>
+
+          <div class="mock-question" id="englishQuiz">
+            <h3>单词题示例</h3>
+            <p id="englishStem">“严谨的” 对应哪个单词？</p>
+            <div class="options" id="englishOptions"></div>
+            <button id="checkEnglish">提交答案并查看解析</button>
+            <div class="answer hidden" id="englishAnswer"></div>
+          </div>
+
+          <div class="word-tools">
+            <h3>PDF 转 TXT（仅英文单词）</h3>
+            <div class="action-row">
+              <button id="extractWords">提取英文单词</button>
+              <button id="speakWord">朗读首个单词</button>
+            </div>
+            <textarea id="wordOutput" placeholder="提取结果会显示在这里（仅英文单词）"></textarea>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="408">
+          <h2>408 界面</h2>
+          <p class="hint">科目：数据结构、计算机组成原理、操作系统、计算机网络。每科可上传题目册与解析册（多文件）。</p>
+          <div class="subjects-4xx" id="subjects408"></div>
+        </section>
+
+        <section class="panel" data-panel="others">
+          <h2>其他科目界面</h2>
+          <p class="hint">可自定义任意科目，上传题目册与解析册后开始刷题。</p>
+          <div class="upload-grid">
+            <label class="upload-card">
+              <span>上传其他科目题目册 PDF（可多选）</span>
+              <input type="file" accept="application/pdf" multiple data-module="others" data-type="question" />
+            </label>
+            <label class="upload-card">
+              <span>上传其他科目解析册 PDF（可多选）</span>
+              <input type="file" accept="application/pdf" multiple data-module="others" data-type="analysis" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="settings">
+          <h2>设置</h2>
+          <div class="settings-list">
+            <label>
+              <span>单文件上传大小限制（MB）</span>
+              <input type="range" min="5" max="200" value="50" id="maxFileSize" />
+              <strong id="sizeValue">50MB</strong>
+            </label>
+            <label>
+              <span>推荐 AI 处理文件范围（MB）</span>
+              <input type="range" min="5" max="100" value="30" id="aiBestRange" />
+              <strong id="bestRangeValue">30MB 内最佳</strong>
+            </label>
+            <label>
+              <span>大模型切换</span>
+              <select id="modelSelect">
+                <option>GPT-4o-mini</option>
+                <option selected>GPT-4.1</option>
+                <option>DeepSeek-V3</option>
+                <option>Qwen-Max</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="delete-box">
+            <h3>按模块删除已上传题库（不会全删）</h3>
+            <select id="deleteModule"></select>
+            <select id="deleteFile"></select>
+            <button id="deleteFileBtn" class="danger">删除选中题库</button>
+          </div>
+        </section>
+      </main>
+
+      <section class="progress hidden" id="progressWrap">
+        <div class="progress-card">
+          <h3 id="progressTitle">正在处理文件...</h3>
+          <div class="bar"><i id="barFill"></i></div>
+          <p id="progressText">0%</p>
+        </div>
+      </section>
+
+      <section class="toast-wrap" id="toastWrap"></section>
+
+      <nav class="bottom-tabs">
+        <button class="tab active" data-tab="math">数学</button>
+        <button class="tab" data-tab="english">英语</button>
+        <button class="tab" data-tab="408">408</button>
+        <button class="tab" data-tab="others">其他</button>
+        <button class="tab" data-tab="settings">设置</button>
+      </nav>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
